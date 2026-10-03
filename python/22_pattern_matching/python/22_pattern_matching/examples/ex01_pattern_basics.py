@@ -51,3 +51,36 @@ def describe_shape(shape: Any) -> str:
         anything else -> "unknown"
     """
     raise NotImplementedError
+def transform_command(command: str) -> str:
+    """Return a canonical form for a user command.
+
+    Rules (case-insensitive, ignore surrounding whitespace):
+        quit | exit | q     -> "quit"
+        help | h | ?        -> "help"
+        save <name>         -> "save: <name>"
+        load <name>         -> "load: <name>"
+        empty string        -> "empty"
+        anything else       -> "unknown: <original>"
+
+    The "save" and "load" commands take one argument (the name).
+    Example: "  Save   model_v1 " -> "save: model_v1"
+
+    Use match/case with capture and OR patterns.
+    """
+    raise NotImplementedError
+
+
+def route_message(msg: dict) -> str:
+    """Route a message dict to its handler description.
+
+    Rules:
+        {"type": "user", "id": int} -> "user:<id>"
+        {"type": "post", "author": str, "content": str} -> "post by <author>"
+        {"type": "comment", "post_id": int, "text": str} -> "comment on <post_id>"
+        {"type": "error", "message": str} -> "error: <message>"
+        any other dict -> "unrouted"
+        not a dict -> "invalid"
+
+    Use match/case with mapping patterns and class patterns.
+    """
+    raise NotImplementedError
