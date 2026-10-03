@@ -79,3 +79,72 @@ def test_fetch_user_failure():
 
     with pytest.raises(ValueError, match="failed to fetch user 1: 404"):
         fetch_user(1, client)
+# ---------------------------------------------------------------
+# side_effect: make a mock do more than return a value
+# ---------------------------------------------------------------
+
+def test_side_effect_sequence():
+    m = Mock(side_effect=[1, 2, 3])
+    assert m() == 1
+    assert m() == 2
+    assert m() == 3
+    with pytest.raises(StopIteration):
+        m()
+
+
+def test_side_effect_exception():
+    m = Mock(side_effect=ValueError("boom"))
+    with pytest.raises(ValueError, match="boom"):
+        m()
+
+
+def test_side_effect_function():
+    def double(x):
+        return x * 2
+
+    m = Mock(side_effect=double)
+    assert m(5) == 10
+    assert m(7) == 14
+
+
+# ---------------------------------------------------------------
+# Testing send_welcome_email with a mock mailer
+# ---------------------------------------------------------------
+
+def test_send_welcome_email_calls_mailer_with_correct_args():
+    mailer = MagicMock()
+    mailer.send.return_value = "msg-42"
+
+    user = {"name": "Ada", "email": "ada@example.com"}
+    result = send_welcome_email(user, mailer)
+
+    assert result == "msg-42"
+    mailer.send.assert_called_once_with(
+        to="ada@example.com",
+        subject="Welcome",
+        body="Hello Ada",
+    )
+
+
+# ---------------------------------------------------------------
+# patch: replace an object temporarily, automatically restore
+# ---------------------------------------------------------------
+
+def test_patch_replaces_function_temporarily():
+    import os
+
+    with patch("os.getcwd", return_value="/fake/path"):
+        assert os.getcwd() == "/fake/path"
+
+    # After the with block, os.getcwd is restored
+    assert os.getcwd() != "/fake/path"
+
+
+# ---------------------------------------------------------------
+# autospec: mocks that respect the real signature
+# ---------------------------------------------------------------
+
+def test_magicmock_assert_not_called():
+    mailer = MagicMock()
+    assert mailer.send.call_count == 0
+    mailer.send.assert_not_called()
