@@ -131,7 +131,49 @@ def test_cart_add_same_item_twice(cart_with_items):
     # now 5 apples + 1 bread = 5 * 0.5 + 2.0 = 4.5
     assert cart_with_items.total() == pytest.approx(4.5)
 
+# ---------------------------------------------------------------
+# Fixture scopes and monkeypatching
+# ---------------------------------------------------------------
 
+@pytest.fixture
+def sample_data():
+    return [1, 2, 3, 4, 5]
+
+
+def test_sum_with_fixture(sample_data):
+    assert sum(sample_data) == 15
+
+
+def test_max_with_fixture(sample_data):
+    assert max(sample_data) == 5
+
+
+def test_monkeypatch_example(monkeypatch):
+    """monkeypatch can replace attributes on modules during a test."""
+    import os
+    monkeypatch.setenv("MY_TEST_VAR", "hello")
+    assert os.environ["MY_TEST_VAR"] == "hello"
+    # pytest automatically reverts the change after this test
+
+
+def test_skip_marker_demo():
+    pytest.skip("demonstration of pytest.skip — remove in real tests")
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        (0, 0),
+        (5, 1),
+        (-5, -1),
+    ],
+)
+def test_sign_function(value, expected):
+    def sign(x):
+        if x == 0:
+            return 0
+        return 1 if x > 0 else -1
+    assert sign(value) == expected
 if __name__ == "__main__":
     import sys
     sys.exit(pytest.main([__file__, "-v"]))
