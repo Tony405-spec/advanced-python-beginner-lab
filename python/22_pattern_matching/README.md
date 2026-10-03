@@ -25,7 +25,7 @@ handling heterogeneous JSON payloads, and command routing in CLI tools.
 - `examples/01_basics.py`
 - `examples/02_structural_matching.py`
 - `exercises/`
-- `tests/`
+- `tests/`..
 
 ## References
 
