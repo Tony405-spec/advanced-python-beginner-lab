@@ -52,6 +52,26 @@ def cached_square(n: int) -> int:
 def describe(value) -> str:
     """Fallback for unknown types."""
     return f"unknown type: {type(value).__name__}"
+@describe.register
+def _(value: dict) -> str:
+    return f"dict with keys {sorted(value)}"
+
+
+def make_scaler(mean: float, std: float):
+    """Return a partial that standardizes a single value.
+
+    Useful for feature pipelines: fit once, apply many times.
+    """
+    def _standardize(x: float, *, mean: float, std: float) -> float:
+        return (x - mean) / std
+    return partial(_standardize, mean=mean, std=std)
+
+
+@lru_cache(maxsize=256)
+def expensive_feature(name: str, window: int) -> float:
+    """Pretend to compute a rolling feature; cached for reuse."""
+    time.sleep(0.001)
+    return float(len(name) * window) / 10.0
 
 
 @describe.register
@@ -104,6 +124,29 @@ def main() -> None:
     print("\n=== singledispatch ===")
     for value in [42, "hello", [1, 2, 3], 3.14, None]:
         print(f"  {value!r:>10} -> {describe(value)}")
+        print("\n=== singledispatch with dict support ===")
+    print(f"  {{'a': 1, 'b': 2}} -> {describe({'a': 1, 'b': 2})}")
+
+    print("\n=== Feature pipeline: partial for standardization ===")
+    scaler = make_scaler(mean=100.0, std=15.0)
+    raw_values = [85, 100, 115, 130]
+    standardized = [scaler(v) for v in raw_values]
+    print(f"  raw          = {raw_values}")
+    print(f"  standardized = {[round(s, 3) for s in standardized]}")
+
+    print("\n=== Cached feature extraction ===")
+    t0 = time.perf_counter()
+    for _ in range(50):
+        expensive_feature("age", 30)
+    cold = time.perf_counter() - t0
+
+    t0 = time.perf_counter()
+    for _ in range(50):
+        expensive_feature("age", 30)
+    hot = time.perf_counter() - t0
+
+    print(f"  cold: {cold:.4f}s, hot: {hot:.4f}s")
+    print(f"  cache info: {expensive_feature.cache_info()}")
 
 
 if __name__ == "__main__":
