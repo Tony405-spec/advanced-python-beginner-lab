@@ -78,7 +78,35 @@ def dispatch_event(event: dict) -> str:
         case _:
             return "malformed event"
 
+def json_response_summary(response: dict) -> str:
+    """Summarize a JSON-style API response using structural matching."""
+    match response:
+        case {"status": 200, "data": {"users": [*users]}}:
+            return f"OK — {len(users)} users returned"
+        case {"status": 200, "data": dict() as payload}:
+            return f"OK — payload keys: {sorted(payload)}"
+        case {"status": 404}:
+            return "not found"
+        case {"status": 500, "error": msg}:
+            return f"server error: {msg}"
+        case {"status": int(code)} if code >= 400:
+            return f"client/server error {code}"
+        case _:
+            return "unrecognized response shape"
 
+
+def classify_shape(shape) -> str:
+    """Classify geometric shapes using nested class patterns."""
+    match shape:
+        case Circle(center=Point(x=0, y=0), radius=r):
+            return f"circle centered at origin, radius={r}"
+        case Circle(center=Point(x=x, y=y), radius=r):
+            return f"circle at ({x}, {y}), radius={r}"
+        case Point(x=x, y=y):
+            return f"point ({x}, {y})"
+        case _:
+            return "unknown shape"
+            
 def main() -> None:
     print("=== Class patterns ===")
     for p in [Point(0, 0), Point(0, 5), Point(3, 0), Point(4, 4), Point(2, 7)]:
@@ -110,6 +138,27 @@ def main() -> None:
     for event in events:
         print(f"  {event}: {dispatch_event(event)}")
 
+    print("\n=== JSON response summary ===")
+    responses = [
+        {"status": 200, "data": {"users": [{"id": 1}, {"id": 2}]}},
+        {"status": 200, "data": {"count": 5, "page": 1}},
+        {"status": 404},
+        {"status": 500, "error": "db down"},
+        {"status": 418},
+        {"foo": "bar"},
+    ]
+    for response in responses:
+        print(f"  {response}: {json_response_summary(response)}")
 
+    print("\n=== Shape classification (nested class patterns) ===")
+    shapes = [
+        Circle(Point(0, 0), 5),
+        Circle(Point(3, 4), 2),
+        Point(7, 8),
+        "not a shape",
+    ]
+    for shape in shapes:
+        print(f"  {shape}: {classify_shape(shape)}")
+        
 if __name__ == "__main__":
     main()
