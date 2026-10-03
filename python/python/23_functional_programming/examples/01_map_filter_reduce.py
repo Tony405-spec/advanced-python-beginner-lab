@@ -20,6 +20,25 @@ def is_even(n: int) -> bool:
 def product(nums: list[int]) -> int:
     """Multiply a list of ints using reduce."""
     return reduce(lambda a, b: a * b, nums, 1)
+def pipeline(data: list[float], threshold: float) -> float:
+    """Sum of Celsius values above threshold, converted to Fahrenheit.
+
+    Composes filter -> map -> reduce in one expression.
+    """
+    above = filter(lambda c: c > threshold, data)
+    converted = map(celsius_to_fahrenheit, above)
+    return reduce(lambda a, b: a + b, converted, 0.0)
+
+
+def summarize(nums: list[int]) -> dict:
+    """Return a summary dict using only map/filter/reduce."""
+    return {
+        "count": len(nums),
+        "sum": reduce(lambda a, b: a + b, nums, 0),
+        "product": product(nums),
+        "evens": list(filter(is_even, nums)),
+        "doubled": list(map(lambda n: n * 2, nums)),
+    }
 
 
 def main() -> None:
@@ -50,6 +69,14 @@ def main() -> None:
     print(f"  map()           = {functional}")
     print(f"  comprehension   = {comprehension}")
     print("  (comprehension is usually more readable)")
+        print("\n=== Composed pipeline: filter -> map -> reduce ===")
+    total_f = pipeline([5, 15, 25, 35], threshold=10)
+    print(f"  sum of >10C in Fahrenheit = {total_f:.2f}")
+
+    print("\n=== summarize() using map/filter/reduce only ===")
+    summary = summarize([1, 2, 3, 4, 5])
+    for k, v in summary.items():
+        print(f"  {k:>8} = {v}")
 
 
 if __name__ == "__main__":
