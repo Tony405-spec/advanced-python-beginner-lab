@@ -5,17 +5,40 @@ Run:
 """
 
 from itertools import (
+    accumulate,
     chain,
     combinations,
+    compress,
     count,
+    dropwhile,
     groupby,
     islice,
     permutations,
     product,
     repeat,
+    takewhile,
 )
 
+def moving_totals(values: list[float]) -> list[float]:
+    """Cumulative sum — handy for running totals in feature engineering."""
+    return list(accumulate(values))
 
+
+def running_max(values: list[float]) -> list[float]:
+    """Cumulative max — running high-water mark."""
+    import operator
+    return list(accumulate(values, func=operator.max))
+
+
+def lazy_batches(data, batch_size: int):
+    """Yield successive batches from any iterable — classic mini-batching."""
+    it = iter(data)
+    while True:
+        batch = list(islice(it, batch_size))
+        if not batch:
+            return
+        yield batch
+        
 def main() -> None:
     print("=== chain: glue multiple iterables ===")
     a = [1, 2, 3]
@@ -63,6 +86,24 @@ def main() -> None:
     print(f"  combinations('ABC', 2) = {list(combinations(pool, 2))}")
     print(f"  permutations('ABC', 2) = {list(permutations(pool, 2))}")
 
+        print("\n=== accumulate: running totals and running max ===")
+    prices = [100.0, 105.0, 98.0, 110.0, 92.0]
+    print(f"  prices        = {prices}")
+    print(f"  running total = {moving_totals(prices)}")
+    print(f"  running max   = {running_max(prices)}")
 
+    print("\n=== takewhile and dropwhile ===")
+    seq = [1, 2, 3, 10, 4, 5]
+    print(f"  takewhile(<5) = {list(takewhile(lambda x: x < 5, seq))}")
+    print(f"  dropwhile(<5) = {list(dropwhile(lambda x: x < 5, seq))}")
+
+    print("\n=== compress: keep by boolean mask ===")
+    values = ["a", "b", "c", "d"]
+    mask = [True, False, True, False]
+    print(f"  compress = {list(compress(values, mask))}")
+
+    print("\n=== lazy mini-batching ===")
+    for i, batch in enumerate(lazy_batches(range(1, 11), batch_size=3)):
+        print(f"  batch {i}: {batch}")
 if __name__ == "__main__":
     main()
