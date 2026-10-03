@@ -96,3 +96,89 @@ def test_fold_sum_ints():
 
 def test_fold_sum_floats():
     assert ex.fold_sum([1.5, 2.5]) == 4.0
+# ---------------------------------------------------------------
+# compose
+# ---------------------------------------------------------------
+
+def test_compose_empty_is_identity():
+    assert ex.compose()(42) == 42
+
+
+def test_compose_single():
+    assert ex.compose(lambda x: x + 1)(5) == 6
+
+
+def test_compose_order():
+    # compose(f, g)(x) == f(g(x))
+    f = lambda x: x * 2
+    g = lambda x: x + 3
+    assert ex.compose(f, g)(4) == 14      # (4 + 3) * 2
+    assert ex.compose(g, f)(4) == 11      # (4 * 2) + 3
+
+
+def test_compose_three():
+    f = lambda x: x + 1
+    g = lambda x: x * 2
+    h = lambda x: x - 3
+    # compose(f, g, h)(10) == f(g(h(10))) == ((10 - 3) * 2) + 1 == 15
+    assert ex.compose(f, g, h)(10) == 15
+
+
+# ---------------------------------------------------------------
+# curry_add
+# ---------------------------------------------------------------
+
+def test_curry_add_basic():
+    assert ex.curry_add(3)(4) == 7
+
+
+def test_curry_add_zero():
+    assert ex.curry_add(0)(0) == 0
+
+
+def test_curry_add_negative():
+    assert ex.curry_add(-5)(10) == 5
+
+
+# ---------------------------------------------------------------
+# unique_ordered
+# ---------------------------------------------------------------
+
+def test_unique_ordered_empty():
+    assert ex.unique_ordered([]) == []
+
+
+def test_unique_ordered_no_dupes():
+    assert ex.unique_ordered([1, 2, 3]) == [1, 2, 3]
+
+
+def test_unique_ordered_with_dupes():
+    assert ex.unique_ordered([3, 1, 3, 2, 1]) == [3, 1, 2]
+
+
+def test_unique_ordered_strings():
+    assert ex.unique_ordered(["a", "b", "a", "c", "b"]) == ["a", "b", "c"]
+
+
+# ---------------------------------------------------------------
+# pairwise
+# ---------------------------------------------------------------
+
+def test_pairwise_empty():
+    assert list(ex.pairwise([])) == []
+
+
+def test_pairwise_one_element():
+    assert list(ex.pairwise([1])) == []
+
+
+def test_pairwise_two():
+    assert list(ex.pairwise([1, 2])) == [(1, 2)]
+
+
+def test_pairwise_many():
+    assert list(ex.pairwise([1, 2, 3, 4])) == [(1, 2), (2, 3), (3, 4)]
+
+
+def test_pairwise_strings():
+    assert list(ex.pairwise("abc")) == [("a", "b"), ("b", "c")]
