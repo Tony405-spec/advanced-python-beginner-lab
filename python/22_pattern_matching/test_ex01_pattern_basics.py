@@ -76,3 +76,73 @@ def test_http_class(code, expected):
 )
 def test_parse_date_like(value, expected):
     assert ex.parse_date_like(value) == expected
+# ---------------------------------------------------------------
+# describe_shape
+# ---------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        (42, "number: 42"),
+        (3.14, "number: 3.14"),
+        ("hello", "text: hello"),
+        ([1, 2, 3], "sequence of 3"),
+        ((1, 2), "sequence of 2"),
+        ({"a": 1, "b": 2}, "mapping with 2 keys"),
+        (None, "unknown"),
+        (set(), "unknown"),
+    ],
+)
+def test_describe_shape(value, expected):
+    assert ex.describe_shape(value) == expected
+
+
+# ---------------------------------------------------------------
+# transform_command
+# ---------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "raw,expected",
+    [
+        ("quit", "quit"),
+        ("EXIT", "quit"),
+        ("  Q  ", "quit"),
+        ("help", "help"),
+        ("?", "help"),
+        ("save model_v1", "save: model_v1"),
+        ("  Save   model_v1 ", "save: model_v1"),
+        ("load checkpoint_a", "load: checkpoint_a"),
+        ("", "empty"),
+        ("   ", "empty"),
+        ("random", "unknown: random"),
+    ],
+)
+def test_transform_command(raw, expected):
+    assert ex.transform_command(raw) == expected
+
+
+# ---------------------------------------------------------------
+# route_message
+# ---------------------------------------------------------------
+
+@pytest.mark.parametrize(
+    "msg,expected",
+    [
+        ({"type": "user", "id": 42}, "user:42"),
+        (
+            {"type": "post", "author": "ada", "content": "hi"},
+            "post by ada",
+        ),
+        (
+            {"type": "comment", "post_id": 7, "text": "ok"},
+            "comment on 7",
+        ),
+        ({"type": "error", "message": "boom"}, "error: boom"),
+        ({"type": "other"}, "unrouted"),
+        ({}, "unrouted"),
+        ("not a dict", "invalid"),
+        (None, "invalid"),
+    ],
+)
+def test_route_message(msg, expected):
+    assert ex.route_message(msg) == expected
