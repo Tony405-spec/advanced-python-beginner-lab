@@ -41,3 +41,36 @@ def fold_sum(nums: list) -> int | float:
     fold_sum([1, 2, 3]) == 6
     """
     raise NotImplementedError
+def compose(*funcs: Callable) -> Callable:
+    """Return a single function that applies funcs right-to-left.
+
+    compose(f, g, h)(x) == f(g(h(x)))
+    compose()(x) == x
+    """
+    raise NotImplementedError
+
+
+def curry_add(a: int) -> Callable[[int], int]:
+    """Return a function that adds a to its argument.
+
+    curry_add(3)(4) == 7
+    """
+    raise NotImplementedError
+
+
+def unique_ordered(items: list) -> list:
+    """Return unique items, preserving first-seen order.
+
+    Use only functional tools (no set literal for order, but sets allowed
+    internally with an accumulator). Prefer reduce.
+    """
+    raise NotImplementedError
+
+
+def pairwise(iterable: Iterable):
+    """Yield consecutive (a, b) pairs from iterable.
+
+    list(pairwise([1, 2, 3, 4])) == [(1, 2), (2, 3), (3, 4)]
+    list(pairwise([1])) == []
+    """
+    raise NotImplementedError
