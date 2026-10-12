@@ -41,3 +41,37 @@ def count_records_at_level(caplog, func, *args, **kwargs) -> dict:
     caplog is a pytest fixture; the test file will pass it in.
     """
     raise NotImplementedError
+def build_file_logger(
+    name: str,
+    path: str,
+    level: int = logging.DEBUG,
+) -> logging.Logger:
+    """Return a logger that writes to a file at `path`.
+
+    Requirements:
+        - Uses logging.FileHandler(path, mode="w", encoding="utf-8")
+        - Set the handler formatter to "%(asctime)s | %(levelname)s | %(message)s"
+        - Set logger level to `level`
+        - Do NOT add a console handler
+
+    Calling twice with the same name should return the existing logger
+    (no duplicate handlers).
+    """
+    raise NotImplementedError
+
+
+def safe_log_context(**fields) -> dict:
+    """Return a dict suitable for logger.info(msg, extra=...).
+
+    Requirements:
+        - Drop any key named "message" (reserved by logging)
+        - Drop any key starting with underscore
+        - Drop any key whose value is not JSON-serializable
+          (use json.dumps inside a try/except to test)
+        - Return the cleaned dict
+
+    Example:
+        safe_log_context(user_id=1, password="x", _internal=True) ->
+        {"user_id": 1, "password": "x"}
+    """
+    raise NotImplementedError
