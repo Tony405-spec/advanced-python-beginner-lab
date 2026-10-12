@@ -96,3 +96,56 @@ def test_reverse_preserves_length(xs):
 def test_sort_is_idempotent(xs):
     """Property: sorting twice equals sorting once."""
     assert sort_ints(sort_ints(xs)) == sort_ints(xs)
+# ---------------------------------------------------------------
+# More properties: sort preserves elements and is ordered
+# ---------------------------------------------------------------
+
+@pytest.mark.skipif(not HAS_HYPOTHESIS, reason="hypothesis not installed")
+@given(st.lists(st.integers()))
+def test_sort_preserves_elements(xs):
+    """Property: sorted output contains exactly the same elements."""
+    assert sorted(sort_ints(xs)) == sorted(xs)
+
+
+@pytest.mark.skipif(not HAS_HYPOTHESIS, reason="hypothesis not installed")
+@given(st.lists(st.integers(), min_size=2))
+def test_sort_is_ordered(xs):
+    """Property: sorted output is non-decreasing."""
+    ys = sort_ints(xs)
+    for a, b in zip(ys, ys[1:]):
+        assert a <= b
+
+
+# ---------------------------------------------------------------
+# Properties with preconditions (assume)
+# ---------------------------------------------------------------
+
+@pytest.mark.skipif(not HAS_HYPOTHESIS, reason="hypothesis not installed")
+@given(st.integers(min_value=0), st.integers(min_value=1))
+def test_division_property(a, b):
+    """Property: (a / b) * b ≈ a when b != 0."""
+    assume(b != 0)
+    result = a / b
+    assert result * b == pytest.approx(a)
+
+
+# ---------------------------------------------------------------
+# Strategies: constrain the input space
+# ---------------------------------------------------------------
+
+@pytest.mark.skipif(not HAS_HYPOTHESIS, reason="hypothesis not installed")
+@given(st.lists(st.integers(min_value=0, max_value=100), min_size=1))
+def test_max_is_at_least_every_element(xs):
+    """Property: max(xs) >= x for all x in xs."""
+    m = max(xs)
+    for x in xs:
+        assert m >= x
+
+
+@pytest.mark.skipif(not HAS_HYPOTHESIS, reason="hypothesis not installed")
+@given(st.text(alphabet=st.characters(min_codepoint=97, max_codepoint=122)))
+def test_encode_length_matches_payload(s):
+    """Property: encoded length prefix equals len(payload)."""
+    encoded = encode(s)
+    prefix, _, payload = encoded.partition(":")
+    assert int(prefix) == len(payload)
