@@ -41,7 +41,17 @@ def setup_logger() -> logging.Logger:
 
     return logger
 
+def demo_named_loggers() -> None:
+    """Show that named loggers inherit config from their parent."""
+    parent = logging.getLogger("app")
+    parent.setLevel(logging.DEBUG)
+    parent.addHandler(logging.StreamHandler())
 
+    child = logging.getLogger("app.pipeline")
+    child.info("child logger inherits handlers from 'app'")
+
+    grandchild = logging.getLogger("app.pipeline.etl")
+    grandchild.warning("grandchild also inherits from 'app'")
 def main() -> None:
     logger = setup_logger()
 
@@ -51,7 +61,8 @@ def main() -> None:
     logger.warning("warning — something to keep an eye on")
     logger.error("error — something broke but we kept going")
     logger.critical("critical — something broke badly")
-
+    print("\n=== Named logger hierarchy ===")
+    demo_named_loggers()
     print(f"\n=== Log file written to: {LOG_FILE} ===")
     print("=== Contents of log file: ===")
     if LOG_FILE.exists():
