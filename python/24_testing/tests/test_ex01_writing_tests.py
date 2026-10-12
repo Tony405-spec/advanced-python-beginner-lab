@@ -71,3 +71,51 @@ def test_add_is_commutative():
 )
 def test_is_palindrome(text, expected):
     assert ex.is_palindrome(text) is expected
+# ---------------------------------------------------------------
+# divide
+# ---------------------------------------------------------------
+
+def test_divide_basic():
+    assert ex.divide(10, 2) == 5.0
+
+
+def test_divide_float_result():
+    assert ex.divide(1, 3) == pytest.approx(0.3333, rel=1e-4)
+
+
+def test_divide_negative():
+    assert ex.divide(-1, 2) == -0.5
+
+
+def test_divide_zero_raises():
+    with pytest.raises(ZeroDivisionError):
+        ex.divide(1, 0)
+
+
+# ---------------------------------------------------------------
+# find_max
+# ---------------------------------------------------------------
+
+def test_find_max_ascending():
+    assert ex.find_max([1, 2, 3]) == 3
+
+
+def test_find_max_descending():
+    assert ex.find_max([3, 2, 1]) == 3
+
+
+def test_find_max_single():
+    assert ex.find_max([42]) == 42
+
+
+def test_find_max_negatives():
+    assert ex.find_max([-5, -1, -10]) == -1
+
+
+def test_find_max_empty_raises():
+    with pytest.raises(ValueError, match="non-empty"):
+        ex.find_max([])
+
+
+def test_find_max_returns_type():
+    assert isinstance(ex.find_max([1, 2, 3]), int)
