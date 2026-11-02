@@ -10,3 +10,6 @@ Recursion is a method of solving a problem where the solution depends on smaller
 
 ## Data Science connection
 Recursive tree traversal is the foundation for decision trees and random forests. Understanding the call stack is also critical for debugging deep neural network algorithms.
+
+## Exercises
+Check `exercises/ex01_recursion.py` to practice writing base cases and recursive steps without using loops. Run tests with `pytest tests/test_exercises.py`.
